@@ -1,0 +1,12 @@
+server:
+  port: 8083
+spring:
+  application:
+    name: "generator-rpd"
+
+application:
+  semester-offset: 8
+  files:
+    department-excel-filename: "departments.xlsx"
+    department-txt-filename: "departments.txt"
+    plan-filename: "plan.xlsx"
