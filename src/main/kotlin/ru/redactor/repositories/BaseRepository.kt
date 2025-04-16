@@ -20,7 +20,7 @@ abstract class BaseRepository {
      */
     protected fun load(file: MultipartFile, filename: String, id: UUID? = null, delete: Boolean = true) {
         this::class.java.classLoader.getResource("template.docx")?.path?.substringBeforeLast("/")?.let {
-            val newFile = File("$it/${id?.let { id -> "$id - $filename"}}")
+            val newFile = File("$it/${id?.let { id -> "$id - $filename"} ?: filename}")
             file.transferTo(newFile)
             id?.let { id -> loadEntities(id, newFile) } ?: loadEntities(newFile)
             if (delete) newFile.delete()

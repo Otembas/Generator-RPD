@@ -6,6 +6,8 @@ spring:
 
 application:
   semester-offset: 8
+  waiting-teachers-delay: "PT1S"
+  default-report-value: "Необходимо заполнить вручную"
   files:
     department-excel-filename: "departments.xlsx"
     department-txt-filename: "departments.txt"

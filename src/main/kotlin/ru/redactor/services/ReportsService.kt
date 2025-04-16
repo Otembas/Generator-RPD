@@ -96,10 +96,7 @@ class ReportsService(
                         .trim()
                 )
             } else {
-                context.put(
-                    it.toClassname(),
-                    "Необходимо заполнить вручную"
-                )
+                context.put(it.toClassname(), appProperties.defaultReportValue)
             }
         }
         val fileInfo = mutableListOf<FileInfo>()
