@@ -39,5 +39,6 @@ object HoursUtils {
      *
      * @return Строковое представление количества часов
      */
-    fun toStringHours(hours: Double) = hours.toString().takeIf { it != "0.0" } ?: ""
+    @Suppress("MagicNumber")
+    fun toStringHours(hours: Double) = ((hours * 10).toInt() / 10.0).toString()
 }

@@ -19,7 +19,31 @@ class ExcelService {
      * Возвращает ячейку по ее значению.
      *
      * @param sheet Лист из представления excel файла
-     * @param value Значение ячейки
+     * @param values Список искомых значений
+     * @param strict Строгое совпадение значения ячейки
+     *
+     * @return Ячейка или null, если не найдена
+     */
+    @Suppress("NestedBlockDepth")
+    fun findCellByValue(sheet: Sheet, values: List<String>, strict: Boolean = false): Cell? {
+        sheet.rowIterator().forEach { row ->
+            row.cellIterator().forEach { cell ->
+                val searchValue = values.find { checkCellValue(cell, it, strict) }
+                if (searchValue != null) {
+                    return cell.apply {
+                        setCellValue(cell.stringCellValue.substringAfter(searchValue))
+                    }
+                }
+            }
+        }
+        return null
+    }
+
+    /**
+     * Возвращает ячейку по ее значению.
+     *
+     * @param sheet Лист из представления excel файла
+     * @param value Искомое значение
      * @param strict Строгое совпадение значения ячейки
      *
      * @return Ячейка или null, если не найдена

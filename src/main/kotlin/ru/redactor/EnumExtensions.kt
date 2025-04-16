@@ -5,7 +5,7 @@ package ru.redactor
  *
  * @return Имя перечисления в виде имени класса
  */
-fun <T : Enum<T>> Enum<T>.toClassname(): String {
+fun <T : Enum<T>> Enum<T>.toClassName(): String {
     var prevChar = '$'
     val sb = StringBuilder()
     for (c in name.lowercase().replaceFirstChar { it.uppercase() }) {

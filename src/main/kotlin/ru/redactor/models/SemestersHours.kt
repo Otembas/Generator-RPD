@@ -14,9 +14,9 @@ import ru.redactor.utils.HoursUtils.toStringHours
  * @property otherContactWorksAll Общее количество часов иных контактных видов работ
  * @property individualWorksAll Общее количество часов самостоятельных видов работ
  * @property contact Общая информация о контактных видах работ
- * @property contact Общая информация о видах работ для контроля
+ * @property control Общая информация о видах работ для контроля
  * @property individual Общая информация о самостоятельных видах работ
- * @property firstSemester Номер первого семестра
+ * @property firstSemesterNumber Номер первого семестра
  *
  * @author Konstantin Rogachev <ghosix7@gmail.com>
  */
@@ -26,6 +26,13 @@ class SemestersHours(
     val otherContactWorks: List<TypeWork>,
     val individualWorks: List<TypeWork>,
 ) {
+    companion object {
+        /**
+         * Максимальное количество семестров для таблицы для документа
+         */
+        private const val MAX_SEMESTERS_COUNT = 4
+    }
+
     val classroomWorksAll: String =
         prepareHours(toStringHours(classroomWorks.sumOf { work -> getHoursValue(work.all) }))
 
@@ -50,14 +57,18 @@ class SemestersHours(
                     )
                 )
             }
-            return TypeWork("Контактная работа", typeWorksHours)
+            return TypeWork("Контактная работа", typeWorksHours).apply {
+                hours = sortingHours
+            }
         }
 
     val control: TypeWork
         get() = TypeWork(
             "Подготовка к экзамену",
             individualWorks.find { it.name == "Подготовка к текущему контролю" }!!.hoursBySemester
-        )
+        ).apply {
+            hours = sortingHours
+        }
 
     val classroom: TypeWork = getAllWorks("Аудиторные занятия", classroomWorks)
 
@@ -65,7 +76,31 @@ class SemestersHours(
 
     val individual: TypeWork = getAllWorks("Самостоятельная работа", individualWorks)
 
-    val firstSemester = classroom.hours.takeIf { it.isNotEmpty() }?.first()?.number ?: -1
+    val firstSemesterNumber = classroom.sortingHours.firstOrNull()?.number ?: -1
+
+    init {
+        prepareAllWorks()
+    }
+
+    private fun prepareAllWorks() {
+        prepareWorks(classroomWorks)
+        prepareWorks(otherContactWorks)
+        prepareWorks(individualWorks)
+    }
+
+    private fun prepareWorks(typeWorks: List<TypeWork>) {
+        typeWorks.forEach {
+            val firstSemester = it.sortingHours.firstOrNull() ?: return@forEach
+            val list = it.sortingHours.toMutableList()
+            if (firstSemester.number != firstSemesterNumber) {
+                val offset = firstSemester.number - firstSemesterNumber
+                for (i in 0..<offset) {
+                    list.add(i, Semester(i, ""))
+                }
+            }
+            it.hours = list.take(MAX_SEMESTERS_COUNT)
+        }
+    }
 
     /**
      * Возвращает общие данные видов работ.
@@ -98,6 +133,8 @@ class SemestersHours(
                 }
             }
         }
-        return TypeWork(name, typeWorksHours)
+        return TypeWork(name, typeWorksHours).apply {
+            hours = sortingHours
+        }
     }
 }

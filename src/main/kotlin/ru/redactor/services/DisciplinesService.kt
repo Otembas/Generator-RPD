@@ -53,7 +53,9 @@ class DisciplinesService(
         val disciplines = mutableListOf<Discipline>()
         var currentMandatory = Mandatory.REQUIRED_PART
         val competenciesCell = excelService.findCellByValue(sheet, "Компетенции")!!
-        while (!row.getCell(columnIndex).stringCellValue.contains("Блок 2")) {
+        var condition = !row.getCell(columnIndex).stringCellValue.contains("Блок 2") &&
+            !row.getCell((columnIndex - 1).takeIf { it >= 0 } ?: 0).stringCellValue.contains("Блок 2")
+        while (condition) {
             when (row.getCell(columnIndex).stringCellValue) {
                 "+", "-" -> {
                     fillDiscipline(
@@ -78,6 +80,8 @@ class DisciplinesService(
                 }
             }
             rowIndex++
+            condition = !row.getCell(columnIndex).stringCellValue.contains("Блок 2") &&
+                !row.getCell((columnIndex - 1).takeIf { it >= 0 } ?: 0).stringCellValue.contains("Блок 2")
             row = sheet.getRow(rowIndex)
         }
         return disciplines
@@ -139,7 +143,9 @@ class DisciplinesService(
         val columnIndex = cell.columnIndex
         var rowIndex = cell.rowIndex + 3
         val disciplineHours = mutableListOf<DisciplineHours>()
-        while (!row.getCell(columnIndex).stringCellValue.contains("Блок 2")) {
+        var condition = !row.getCell(columnIndex).stringCellValue.contains("Блок 2") &&
+            !row.getCell((columnIndex - 1).takeIf { it >= 0 } ?: 0).stringCellValue.contains("Блок 2")
+        while (condition) {
             when (row.getCell(columnIndex).stringCellValue) {
                 "+", "-" -> {
                     disciplineHours.add(
@@ -150,6 +156,8 @@ class DisciplinesService(
                     )
                 }
             }
+            condition = !row.getCell(columnIndex).stringCellValue.contains("Блок 2") &&
+                !row.getCell((columnIndex - 1).takeIf { it >= 0 } ?: 0).stringCellValue.contains("Блок 2")
             rowIndex++
             row = sheet.getRow(rowIndex)
         }
