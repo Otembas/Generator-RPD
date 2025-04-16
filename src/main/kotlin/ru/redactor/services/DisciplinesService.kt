@@ -310,10 +310,17 @@ class DisciplinesService(
      * @return Кафедра
      */
     private fun getDepartment(disciplineRow: Row): Department {
-        val departmentCell = excelService.findCellByValue(disciplineRow.sheet, "Закрепленная кафедра")!!
-        val department =
-            departmentsRepository.get(disciplineRow.getCell(departmentCell.columnIndex + 1).stringCellValue)
-                ?: Department("", "", listOf())
+        val disciplineDepartmentNumberCell =
+            excelService.findCellByValue(disciplineRow.sheet, "Закрепленная кафедра")!!
+        val sheet = disciplineRow.sheet.workbook.getSheet("Кафедры")
+        val fixedDepartmentCell = excelService.findCellByValue(
+            sheet,
+            disciplineRow.getCell(disciplineDepartmentNumberCell.columnIndex).stringCellValue
+        )!!
+        val fixedDepartmentNameCell = excelService.findCellByValue(sheet, "Название кафедры")!!
+        val department = departmentsRepository.get(
+            fixedDepartmentCell.row.getCell(fixedDepartmentNameCell.columnIndex).stringCellValue
+        ) ?: Department("", "", listOf())
         return department
     }
 }

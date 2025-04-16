@@ -1,5 +1,6 @@
 package ru.redactor.controllers
 
+import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -27,6 +28,11 @@ class ReportsController(
     private val disciplinesRepository: DisciplinesRepository
 ) {
     /**
+     * Логгер приложения
+     */
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
+    /**
      * Возвращает список данных о сгенерированных файлах.
      *
      * @param filter Данные фильтра
@@ -39,7 +45,7 @@ class ReportsController(
         val result = try {
             reportsService.generateDocxFile(filter)
         } catch (e: Throwable) {
-            println(e.message)
+            logger.error(e.message)
             return ResponseEntity.badRequest().body(listOf())
         }
         return ResponseEntity.ok().body(result)
@@ -52,6 +58,7 @@ class ReportsController(
      */
     @PostMapping("/info")
     fun loadReportInfo(@RequestBody body: ReportInfoWithId) {
+        logger.debug("Loading report info for {}", body.id)
         reportsService.setReportInfo(body.id, body.reportInfo)
     }
 
@@ -64,10 +71,11 @@ class ReportsController(
     @PostMapping("/clean")
     fun clean(@RequestBody body: Map<String, UUID>) {
         try {
+            logger.info("Cleaning for {}", body["id"])
             reportsService.removeGeneratedFiles(body["id"]!!)
             disciplinesRepository.remove(body["id"]!!)
         } catch (e: Throwable) {
-            println(e.message)
+            logger.error(e.message)
         }
     }
 }

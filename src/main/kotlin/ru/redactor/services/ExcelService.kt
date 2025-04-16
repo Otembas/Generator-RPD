@@ -67,6 +67,11 @@ class ExcelService {
                 false -> cell.stringCellValue.contains(value)
             }
         } else {
-            false
+            val searchValue = value.toDoubleOrNull()
+            if (searchValue != null && cell.cellType == CellType.NUMERIC) {
+                cell.numericCellValue == searchValue
+            } else {
+                false
+            }
         }
 }

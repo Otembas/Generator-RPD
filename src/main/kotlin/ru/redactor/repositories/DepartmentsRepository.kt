@@ -2,6 +2,7 @@ package ru.redactor.repositories
 
 import jakarta.annotation.PreDestroy
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.slf4j.LoggerFactory
 import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
@@ -21,6 +22,11 @@ import java.util.concurrent.ConcurrentHashMap
  */
 @Component
 class DepartmentsRepository(private val appProperties: AppProperties) : BaseRepository() {
+    /**
+     * Логгер приложения
+     */
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
     /**
      * Хранилище кафедр
      */
@@ -74,7 +80,7 @@ class DepartmentsRepository(private val appProperties: AppProperties) : BaseRepo
                 }
             )
         } catch (e: Throwable) {
-            println(e.message)
+            logger.error(e.message)
         }
     }
 
@@ -96,7 +102,7 @@ class DepartmentsRepository(private val appProperties: AppProperties) : BaseRepo
             "txt" -> loadDepartmentsFromTxt(file)
             "xls", "xlsx" -> loadDepartmentsFromExcel(file)
         }
-        println("Departments loaded")
+        logger.info("Departments loaded")
     }
 
     /**
@@ -113,7 +119,7 @@ class DepartmentsRepository(private val appProperties: AppProperties) : BaseRepo
                 }
             }
         } else {
-            println("Failed to load departments file: File can't be read")
+            logger.warn("Failed to load departments file: File don't exists or file can't be read")
         }
     }
 
@@ -151,6 +157,7 @@ class DepartmentsRepository(private val appProperties: AppProperties) : BaseRepo
     @PreDestroy
     fun destroy() {
         this::class.java.classLoader.getResource("template.docx")?.path?.substringBeforeLast("/")?.let {
+            logger.info("Saving departments")
             val file = File("$it/departments.txt")
             file.writer().use { writer ->
                 departments.entries.forEach { entry -> writeDepartment(writer, entry) }
@@ -179,6 +186,7 @@ class DepartmentsRepository(private val appProperties: AppProperties) : BaseRepo
      * @param teachers Список преподавателей кафедры
      */
     private fun saveDepartment(key: String, director: String, teachers: List<String>) {
+        logger.debug("Saving department {}", key)
         val departmentName = key.trim().replaceFirstChar { it.lowercase() }
         departments[departmentName] = Department(key.trim(), director.trim(), teachers.toList())
     }

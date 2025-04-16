@@ -1,5 +1,6 @@
 package ru.redactor.controllers
 
+import org.slf4j.LoggerFactory
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -29,6 +30,11 @@ class FilesController(
     private val departmentsRepository: DepartmentsRepository,
     private val disciplinesRepository: DisciplinesRepository
 ) {
+    /**
+     * Логгер приложения
+     */
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
     /**
      * Загружает список кафедр из файла.
      *
@@ -69,7 +75,7 @@ class FilesController(
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=generated.docx")
                 .body(file.contentAsByteArray)
         } catch (e: Throwable) {
-            println(e.message)
+            logger.error(e.message)
             ResponseEntity.badRequest().body(e.message?.toByteArray() ?: ByteArray(0))
         }
 }
