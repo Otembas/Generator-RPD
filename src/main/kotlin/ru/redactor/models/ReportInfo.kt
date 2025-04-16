@@ -15,8 +15,8 @@ import java.util.Locale
  * @author Konstantin Rogachev <ghosix7@gmail.com>
  */
 class ReportInfo(
-    departmentProtocol: Protocol? = null,
-    commissionProtocol: Protocol? = null,
+    val departmentProtocol: Protocol? = null,
+    val commissionProtocol: Protocol? = null,
     val year: Int? = null,
     val creators: List<String>? = null
 ) {
@@ -27,9 +27,11 @@ class ReportInfo(
         private const val DEFAULT_PROTOCOL_STRING = "Необходимо заполнить вручную"
     }
 
-    val departmentProtocolString: String = getProtocolString(departmentProtocol)
+    val departmentProtocolString: String
+        get() = getProtocolString(departmentProtocol)
 
-    val commissionProtocolString: String = getProtocolString(commissionProtocol)
+    val commissionProtocolString: String
+        get() = getProtocolString(commissionProtocol)
 
     /**
      * Возвращает строковое представление протокола утверждения дисциплины.
