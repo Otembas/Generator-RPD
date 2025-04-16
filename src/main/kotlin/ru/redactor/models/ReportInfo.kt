@@ -15,11 +15,18 @@ import java.util.Locale
  * @author Konstantin Rogachev <ghosix7@gmail.com>
  */
 class ReportInfo(
-    departmentProtocol: Protocol,
-    commissionProtocol: Protocol,
+    departmentProtocol: Protocol? = null,
+    commissionProtocol: Protocol? = null,
     val year: Int? = null,
     val creators: List<String>? = null
 ) {
+    companion object {
+        /**
+         * Строковое представление протокола по умолчанию
+         */
+        private const val DEFAULT_PROTOCOL_STRING = "Необходимо заполнить вручную"
+    }
+
     val departmentProtocolString: String = getProtocolString(departmentProtocol)
 
     val commissionProtocolString: String = getProtocolString(commissionProtocol)
@@ -31,7 +38,8 @@ class ReportInfo(
      *
      * @return Строковое представление протокола
      */
-    private fun getProtocolString(protocol: Protocol): String {
+    private fun getProtocolString(protocol: Protocol?): String {
+        if (protocol == null) return DEFAULT_PROTOCOL_STRING
         val preparedDate = protocol.date.atZoneSameInstant(protocol.timeZone.toZoneId())
         val dateString = "«${preparedDate.dayOfMonth}» " +
             "${preparedDate.month.getDisplayName(TextStyle.FULL, Locale.of("ru"))} " +
