@@ -11,37 +11,37 @@ package ru.redactor.enums
  */
 @Suppress("MagicNumber")
 enum class SimpleField(
-    val xlsValue: String,
+    val xlsValue: List<String>,
     val sheet: String,
     val offset: Int = 0
 ) {
     /**
      * Квалификация
      */
-    QUALIFICATION("Квалификация", "Титул"),
+    QUALIFICATION(listOf("Квалификация"), "Титул"),
 
     /**
      * Форма обучения
      */
-    FORM_EDUCATION("Форма обучения", "Титул"),
+    FORM_EDUCATION(listOf("Форма обучения"), "Титул"),
 
     /**
      * Факультет
      */
-    FACULTY("Факультет", "Титул", 1),
+    FACULTY(listOf("Факультет"), "Титул", 1),
 
     /**
      * Специализация
      */
-    SPEC("Направление подготовки", "Титул"),
+    SPEC(listOf("Направление подготовки"), "Титул"),
 
     /**
      * Профиль
      */
-    PROFILE("Программа магистратуры", "Титул", 1),
+    PROFILE(listOf("Программа магистратуры", "Профиль"), "Титул", 1),
 
     /**
      * Председатель УМК
      */
-    CHAIRMAN_UMK("Председатель УМК", "Титул", 10)
+    CHAIRMAN_UMK(listOf("Председатель УМК"), "Титул", 10)
 }

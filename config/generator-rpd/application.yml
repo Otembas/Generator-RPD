@@ -5,9 +5,9 @@ spring:
     name: "generator-rpd"
 
 application:
-  semester-offset: 8
-  waiting-teachers-delay: "PT1S"
-  default-report-value: "Необходимо заполнить вручную"
+  semester-offset: ${SEMESTER_OFFSET:8}
+  waiting-teachers-delay: ${WAITING_TEACHERS_DELAY:PT1S}
+  default-report-value: ${DEFAULT_REPORT_VALUE:Необходимо заполнить вручную}
   files:
     department-excel-filename: "departments.xlsx"
     department-txt-filename: "departments.txt"

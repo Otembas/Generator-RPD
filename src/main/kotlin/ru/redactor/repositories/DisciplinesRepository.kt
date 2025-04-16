@@ -62,7 +62,9 @@ class DisciplinesRepository(
         cell ?: return
         val columnIndex = cell.columnIndex
         var rowIndex = cell.rowIndex + 3
-        while (!row.getCell(columnIndex).stringCellValue.contains("Блок 2")) {
+        var condition = !row.getCell(columnIndex).stringCellValue.contains("Блок 2") &&
+            !row.getCell((columnIndex - 1).takeIf { it >= 0 } ?: 0).stringCellValue.contains("Блок 2")
+        while (condition) {
             when (row.getCell(columnIndex).stringCellValue) {
                 "+", "-" -> {
                     row.getCell(columnIndex + 2).let {
@@ -74,6 +76,8 @@ class DisciplinesRepository(
             }
             rowIndex++
             row = sheet.getRow(rowIndex)
+            condition = !row.getCell(columnIndex).stringCellValue.contains("Блок 2") &&
+                !row.getCell((columnIndex - 1).takeIf { it >= 0 } ?: 0).stringCellValue.contains("Блок 2")
         }
     }
 

@@ -2,6 +2,7 @@ package ru.redactor.models
 
 import ru.redactor.enums.TypeWorks
 import ru.redactor.utils.HoursUtils.prepareHours
+import ru.redactor.utils.HoursUtils.toStringHours
 
 /**
  * Модель вида работы.
@@ -16,21 +17,19 @@ import ru.redactor.utils.HoursUtils.prepareHours
  */
 class TypeWork(val name: String, val hoursBySemester: MutableList<Semester>, val type: TypeWorks? = null) {
     val all by lazy {
-        prepareHours(hoursBySemester.sumOf { if (it.hours.isBlank()) 0.0 else it.hours.toDouble() }.toString())
+        prepareHours(toStringHours(hoursBySemester.sumOf { if (it.hours.isBlank()) 0.0 else it.hours.toDouble() }))
     }
 
-    val hours by lazy {
-        hoursBySemester
-            .sortedWith { s1, s2 ->
-                if (s1.hours.isBlank() && s2.hours.isBlank()) {
-                    0
-                } else if (s1.hours.isBlank()) {
-                    1
-                } else if (s2.hours.isBlank()) {
-                    -1
-                } else {
-                    s1.number - s2.number
-                }
+    val sortingHours by lazy {
+        hoursBySemester.sortedWith { s1, s2 ->
+            when {
+                s1.hours.isBlank() && s2.hours.isBlank() -> 0
+                s1.hours.isBlank() -> 1
+                s2.hours.isBlank() -> -1
+                else -> s1.number - s2.number
             }
+        }
     }
+
+    lateinit var hours: List<Semester>
 }

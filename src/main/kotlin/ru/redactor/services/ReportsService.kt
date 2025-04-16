@@ -13,7 +13,7 @@ import ru.redactor.models.FileInfo
 import ru.redactor.models.Filter
 import ru.redactor.models.ReportInfo
 import ru.redactor.properties.AppProperties
-import ru.redactor.toClassname
+import ru.redactor.toClassName
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -86,24 +86,23 @@ class ReportsService(
             val cell = excelService.findCellByValue(sheet, it.xlsValue)
             if (cell != null) {
                 context.put(
-                    it.toClassname(),
+                    it.toClassName(),
                     cell.row
                         .getCell(cell.columnIndex + it.offset)
                         .stringCellValue
-                        .substringAfter(it.xlsValue)
                         .replace(":", "")
                         .replace("/", "")
                         .trim()
                 )
             } else {
-                context.put(it.toClassname(), appProperties.defaultReportValue)
+                context.put(it.toClassName(), appProperties.defaultReportValue)
             }
         }
         val fileInfo = mutableListOf<FileInfo>()
         disciplines.forEach { discipline ->
             val currentDiscipline = discipline.apply {
                 previousDisciplines = disciplinesService.getDisciplinesHours(workbook).mapNotNull {
-                    if (semestersHours.firstSemester > it.semestersHours.firstSemester && name != it.name) {
+                    if (semestersHours.firstSemesterNumber > it.semestersHours.firstSemesterNumber && name != it.name) {
                         it.name
                     } else {
                         null

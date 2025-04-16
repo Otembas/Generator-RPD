@@ -1,5 +1,6 @@
 package ru.redactor.models
 
+import org.springframework.beans.factory.annotation.Value
 import java.time.format.TextStyle
 import java.util.Locale
 
@@ -20,12 +21,8 @@ class ReportInfo(
     val year: Int? = null,
     val creators: List<String>? = null
 ) {
-    companion object {
-        /**
-         * Строковое представление протокола по умолчанию
-         */
-        private const val DEFAULT_PROTOCOL_STRING = "Необходимо заполнить вручную"
-    }
+    @Value("\${application.default-report-value}")
+    private val defaultReportValue: String? = null
 
     val departmentProtocolString: String
         get() = getProtocolString(departmentProtocol)
@@ -41,7 +38,7 @@ class ReportInfo(
      * @return Строковое представление протокола
      */
     private fun getProtocolString(protocol: Protocol?): String {
-        if (protocol == null) return DEFAULT_PROTOCOL_STRING
+        if (protocol == null) return defaultReportValue!!
         val preparedDate = protocol.date.atZoneSameInstant(protocol.timeZone.toZoneId())
         val dateString = "«${preparedDate.dayOfMonth}» " +
             "${preparedDate.month.getDisplayName(TextStyle.FULL, Locale.of("ru"))} " +
