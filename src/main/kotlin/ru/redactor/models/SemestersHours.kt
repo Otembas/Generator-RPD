@@ -10,12 +10,15 @@ import ru.redactor.utils.HoursUtils.toStringHours
  * @property classroomWorks Аудиторные виды работ
  * @property otherContactWorks Иные контактные виды работ
  * @property individualWorks Самостоятельные виды работ
+ * @property unitInHours Количество часов в зачетной единице
  * @property classroomWorksAll Общее количество часов аудиторных видов работ
  * @property otherContactWorksAll Общее количество часов иных контактных видов работ
  * @property individualWorksAll Общее количество часов самостоятельных видов работ
  * @property contact Общая информация о контактных видах работ
  * @property control Общая информация о видах работ для контроля
  * @property individual Общая информация о самостоятельных видах работ
+ * @property total Общая трудоемкость видов работ
+ * @property totalUnits Общее количество зачетных единиц
  * @property firstSemesterNumber Номер первого семестра
  *
  * @author Konstantin Rogachev <ghosix7@gmail.com>
@@ -25,6 +28,7 @@ class SemestersHours(
     val classroomWorks: List<TypeWork>,
     val otherContactWorks: List<TypeWork>,
     val individualWorks: List<TypeWork>,
+    val unitInHours: Int
 ) {
     companion object {
         /**
@@ -43,24 +47,7 @@ class SemestersHours(
         prepareHours(toStringHours(individualWorks.sumOf { work -> getHoursValue(work.all) }))
 
     val contact: TypeWork
-        get() {
-            val typeWorksHours = mutableListOf<Semester>()
-            classroom.hoursBySemester.forEachIndexed { index, classroomWork ->
-                typeWorksHours.add(
-                    index,
-                    Semester(
-                        classroomWork.number,
-                        (
-                            getHoursValue(classroomWork.hours) +
-                                getHoursValue(otherContact.hoursBySemester.getOrNull(index)?.hours ?: "")
-                            ).toString().takeIf { it != "0.0" } ?: ""
-                    )
-                )
-            }
-            return TypeWork("Контактная работа", typeWorksHours).apply {
-                hours = sortingHours
-            }
-        }
+        get() = getAllWorks("Контактная работа", classroom, otherContact)
 
     val control: TypeWork
         get() = TypeWork(
@@ -76,18 +63,40 @@ class SemestersHours(
 
     val individual: TypeWork = getAllWorks("Самостоятельная работа", individualWorks)
 
+    val total: TypeWork
+        get() = getAllWorks("Общая трудоемкость", contact, individual)
+
+    val totalUnits: TypeWork
+        get() = TypeWork(
+            "Общее количество зачетных единиц",
+            total
+                .hoursBySemester
+                .map { Semester(it.number, prepareHours(toStringHours(getHoursValue(it.hours) / unitInHours))) }
+                .toMutableList()
+        ).apply {
+            hours = sortingHours
+        }
+
     val firstSemesterNumber = classroom.sortingHours.firstOrNull()?.number ?: -1
 
     init {
         prepareAllWorks()
     }
 
+    /**
+     * Подготовка всех видов работ для вывода в документе.
+     */
     private fun prepareAllWorks() {
         prepareWorks(classroomWorks)
         prepareWorks(otherContactWorks)
         prepareWorks(individualWorks)
     }
 
+    /**
+     * Подготовка видов работ определенной категории для вывода в документе.
+     *
+     * @param typeWorks Список видов работ
+     */
     private fun prepareWorks(typeWorks: List<TypeWork>) {
         typeWorks.forEach {
             val firstSemester = it.sortingHours.firstOrNull() ?: return@forEach
@@ -133,7 +142,37 @@ class SemestersHours(
                 }
             }
         }
-        return TypeWork(name, typeWorksHours).apply {
+        return TypeWork(name, typeWorksHours).apply { hours = sortingHours }
+    }
+
+    /**
+     * Возвращает общие данные двух видов работ.
+     *
+     * @param name Имя общего вида работы
+     * @param firstWork Данные вида работ
+     * @param secondWork Данные вида работ
+     *
+     * @return Общее данные видов работ
+     */
+    private fun getAllWorks(name: String, firstWork: TypeWork, secondWork: TypeWork): TypeWork {
+        val typeWorks = mutableListOf<Semester>()
+        firstWork.hoursBySemester.forEachIndexed { index, classroomWork ->
+            typeWorks.add(
+                index,
+                Semester(
+                    classroomWork.number,
+                    (
+                        prepareHours(
+                            toStringHours(
+                                getHoursValue(classroomWork.hours) +
+                                    getHoursValue(secondWork.hoursBySemester.getOrNull(index)?.hours ?: "")
+                            )
+                        )
+                        )
+                )
+            )
+        }
+        return TypeWork(name, typeWorks).apply {
             hours = sortingHours
         }
     }
