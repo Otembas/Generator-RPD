@@ -36,6 +36,13 @@ class DisciplinesService(
     private val departmentsRepository: DepartmentsRepository,
     private val disciplinesRepository: DisciplinesRepository
 ) {
+    companion object {
+        /**
+         * Значение по умолчанию для количества часов в зачетной единице
+         */
+        private const val DEFAULT_UNIT_IN_HOURS = 36
+    }
+
     /**
      * Возвращает список дисциплин из excel файла.
      *
@@ -261,6 +268,7 @@ class DisciplinesService(
      *
      * @return Часы дисциплины по семестрам
      */
+    @Suppress("MagicNumber")
     private fun findSemestersHours(sheet: Sheet, disciplineRow: Row): SemestersHours {
         val firstCourseCell = excelService.findCellByValue(sheet, "Курс 1")!!
         var currentCell = sheet.getRow(firstCourseCell.rowIndex + 1).getCell(firstCourseCell.columnIndex)
@@ -282,10 +290,16 @@ class DisciplinesService(
             i++
             currentCell = currentCell.row.getCell(currentCell.columnIndex + appProperties.semesterOffset)
         }
+        val unitInHours = excelService.findCellByValue(
+            firstCourseCell.sheet.workbook.getSheet("Нормы"),
+            "Академических часов в одной зачетной единице трудоемкости (з.е.)"
+        )
         return SemestersHours(
             typeWorks.filter { it.type?.category == ru.redactor.enums.TypeWorkCategory.CLASSROOM },
             typeWorks.filter { it.type?.category == ru.redactor.enums.TypeWorkCategory.OTHER_CONTACT },
-            typeWorks.filter { it.type?.category == ru.redactor.enums.TypeWorkCategory.INDIVIDUAL }
+            typeWorks.filter { it.type?.category == ru.redactor.enums.TypeWorkCategory.INDIVIDUAL },
+            unitInHours?.let { it.row.getCell(it.columnIndex + 5).stringCellValue.toIntOrNull() }
+                ?: DEFAULT_UNIT_IN_HOURS
         )
     }
 
