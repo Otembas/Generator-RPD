@@ -156,12 +156,12 @@ class DisciplinesService(
         while (condition) {
             when (row.getCell(columnIndex).stringCellValue) {
                 "+", "-" -> {
-                    disciplineHours.add(
-                        DisciplineHours(
-                            row.getCell(columnIndex + 2).stringCellValue,
-                            findSemestersHours(sheet, row)
+                    val disciplineNameCell = row.getCell(columnIndex + 2)
+                    if (!disciplineNameCell.cellStyle.font.bold) {
+                        disciplineHours.add(
+                            DisciplineHours(disciplineNameCell.stringCellValue, findSemestersHours(sheet, row))
                         )
-                    )
+                    }
                 }
             }
             condition = !row.getCell(columnIndex).stringCellValue.contains("Блок 2") &&
@@ -183,7 +183,7 @@ class DisciplinesService(
         val sheet = disciplineCell.sheet
         var row = disciplineCell.row
         var currentMandatory: Mandatory? = null
-        while (currentMandatory == null && row.rowNum >= sheet.firstRowNum) {
+        while (currentMandatory == null && row.rowNum > sheet.firstRowNum) {
             row = sheet.getRow(row.rowNum - 1)
             currentMandatory = Mandatory.getMandatoryByCategory(row.getCell(0).stringCellValue)
         }
