@@ -227,8 +227,8 @@ class DisciplinesService(
                     it.stringCellValue,
                     currentMandatory.value,
                     competences,
-                    row.getCell(unitsCell.columnIndex).stringCellValue.toInt(),
-                    row.getCell(hoursCell.columnIndex).stringCellValue.toInt(),
+                    row.getCell(unitsCell.columnIndex).stringCellValue.toIntOrNull() ?: 0,
+                    row.getCell(hoursCell.columnIndex).stringCellValue.toIntOrNull() ?: 0,
                     semestersHours,
                     department
                 )
