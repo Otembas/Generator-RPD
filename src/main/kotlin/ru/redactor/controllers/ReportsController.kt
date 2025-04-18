@@ -45,7 +45,7 @@ class ReportsController(
         val result = try {
             reportsService.generateDocxFile(filter)
         } catch (e: Throwable) {
-            logger.error(e.message)
+            logger.error(e.message, e)
             return ResponseEntity.badRequest().body(listOf())
         }
         return ResponseEntity.ok().body(result)
@@ -75,7 +75,7 @@ class ReportsController(
             reportsService.removeGeneratedFiles(body["id"]!!)
             disciplinesRepository.remove(body["id"]!!)
         } catch (e: Throwable) {
-            logger.error(e.message)
+            logger.error(e.message, e)
         }
     }
 }

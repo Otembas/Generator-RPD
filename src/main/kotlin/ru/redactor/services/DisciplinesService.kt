@@ -17,7 +17,7 @@ import ru.redactor.models.TypeWork
 import ru.redactor.properties.AppProperties
 import ru.redactor.repositories.DepartmentsRepository
 import ru.redactor.repositories.DisciplinesRepository
-import java.util.*
+import java.util.UUID
 
 /**
  * Сервис для работы с дисциплинами.
@@ -63,6 +63,15 @@ class DisciplinesService(
         var condition = !row.getCell(columnIndex).stringCellValue.contains("Блок 2") &&
             !row.getCell((columnIndex - 1).takeIf { it >= 0 } ?: 0).stringCellValue.contains("Блок 2")
         while (condition) {
+            when (row.getCell(0).stringCellValue) {
+                Mandatory.REQUIRED_PART.category -> {
+                    currentMandatory = Mandatory.REQUIRED_PART
+                }
+
+                Mandatory.FORMED_PARTICIPANTS.category -> {
+                    currentMandatory = Mandatory.FORMED_PARTICIPANTS
+                }
+            }
             when (row.getCell(columnIndex).stringCellValue) {
                 "+", "-" -> {
                     fillDiscipline(
@@ -76,14 +85,6 @@ class DisciplinesService(
                     )?.let { discipline ->
                         disciplines.add(discipline)
                     }
-                }
-
-                Mandatory.REQUIRED_PART.category -> {
-                    currentMandatory = Mandatory.REQUIRED_PART
-                }
-
-                Mandatory.FORMED_PARTICIPANTS.category -> {
-                    currentMandatory = Mandatory.FORMED_PARTICIPANTS
                 }
             }
             rowIndex++
@@ -181,11 +182,11 @@ class DisciplinesService(
     private fun getMandatory(disciplineCell: Cell): Mandatory {
         val sheet = disciplineCell.sheet
         var row = disciplineCell.row
-        var rowValue = row.getCell(disciplineCell.columnIndex).stringCellValue
+        var rowValue = row.getCell(0).stringCellValue
         var currentMandatory: Mandatory? = null
         while (rowValue.isNotBlank() && currentMandatory == null) {
             row = sheet.getRow(row.rowNum - 1)
-            rowValue = row.getCell(disciplineCell.columnIndex).stringCellValue
+            rowValue = row.getCell(0).stringCellValue
             currentMandatory = Mandatory.getMandatoryByCategory(rowValue)
         }
         return currentMandatory ?: Mandatory.REQUIRED_PART

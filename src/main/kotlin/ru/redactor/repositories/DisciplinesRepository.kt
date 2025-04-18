@@ -44,7 +44,7 @@ class DisciplinesRepository(
         try {
             load(file, appProperties.files.planFilename, id, false)
         } catch (e: Throwable) {
-            logger.error(e.message)
+            logger.error(e.message, e)
         }
     }
 
