@@ -75,7 +75,7 @@ class FilesController(
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=generated.docx")
                 .body(file.contentAsByteArray)
         } catch (e: Throwable) {
-            logger.error(e.message)
+            logger.error(e.message, e)
             ResponseEntity.badRequest().body(e.message?.toByteArray() ?: ByteArray(0))
         }
 }

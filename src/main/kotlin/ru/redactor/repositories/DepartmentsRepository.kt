@@ -80,7 +80,7 @@ class DepartmentsRepository(private val appProperties: AppProperties) : BaseRepo
                 }
             )
         } catch (e: Throwable) {
-            logger.error(e.message)
+            logger.error(e.message, e)
         }
     }
 
