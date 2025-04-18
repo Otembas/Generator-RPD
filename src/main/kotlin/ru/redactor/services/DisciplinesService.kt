@@ -182,12 +182,10 @@ class DisciplinesService(
     private fun getMandatory(disciplineCell: Cell): Mandatory {
         val sheet = disciplineCell.sheet
         var row = disciplineCell.row
-        var rowValue = row.getCell(0).stringCellValue
         var currentMandatory: Mandatory? = null
-        while (rowValue.isNotBlank() && currentMandatory == null) {
+        while (currentMandatory == null && row.rowNum >= sheet.firstRowNum) {
             row = sheet.getRow(row.rowNum - 1)
-            rowValue = row.getCell(0).stringCellValue
-            currentMandatory = Mandatory.getMandatoryByCategory(rowValue)
+            currentMandatory = Mandatory.getMandatoryByCategory(row.getCell(0).stringCellValue)
         }
         return currentMandatory ?: Mandatory.REQUIRED_PART
     }
