@@ -49,13 +49,10 @@ class SemestersHours(
     val contact: TypeWork
         get() = getAllWorks("Контактная работа", classroom, otherContact)
 
-    val control: TypeWork
-        get() = TypeWork(
-            "Подготовка к экзамену",
-            individualWorks.find { it.name == "Подготовка к текущему контролю" }!!.hoursBySemester
-        ).apply {
-            hours = sortingHours
-        }
+    val control: TypeWork = TypeWork(
+        "Подготовка к экзамену",
+        individualWorks.find { it.name == "Подготовка к текущему контролю" }!!.hoursBySemester
+    )
 
     val classroom: TypeWork = getAllWorks("Аудиторные занятия", classroomWorks)
 
@@ -74,7 +71,7 @@ class SemestersHours(
                 .map { Semester(it.number, prepareHours(toStringHours(getHoursValue(it.hours) / unitInHours))) }
                 .toMutableList()
         ).apply {
-            hours = sortingHours
+            hours = sortingHours.take(MAX_SEMESTERS_COUNT)
         }
 
     val firstSemesterNumber = classroom.sortingHours.firstOrNull()?.number ?: -1
@@ -90,6 +87,7 @@ class SemestersHours(
         prepareWorks(classroomWorks)
         prepareWorks(otherContactWorks)
         prepareWorks(individualWorks)
+        prepareWorks(listOf(control))
     }
 
     /**
@@ -142,7 +140,7 @@ class SemestersHours(
                 }
             }
         }
-        return TypeWork(name, typeWorksHours).apply { hours = sortingHours }
+        return TypeWork(name, typeWorksHours).apply { hours = sortingHours.take(MAX_SEMESTERS_COUNT) }
     }
 
     /**
@@ -172,8 +170,6 @@ class SemestersHours(
                 )
             )
         }
-        return TypeWork(name, typeWorks).apply {
-            hours = sortingHours
-        }
+        return TypeWork(name, typeWorks).apply { hours = sortingHours.take(MAX_SEMESTERS_COUNT) }
     }
 }
