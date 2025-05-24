@@ -6,6 +6,8 @@ import java.util.Locale
 /**
  * Модель дополнительной информации о файле.
  *
+ * @property departmentProtocol Протокол утверждения на заседании кафедрыи
+ * @property commissionProtocol Протокол утверждения на учебно-методической комиссии факультета
  * @property departmentProtocolString Строковое представление протокола утверждения на заседании кафедры
  * @property commissionProtocolString Строковое представление протокола утверждения на учебно-методической комиссии
  *                                    факультета
@@ -43,7 +45,7 @@ class ReportInfo(
     private fun getProtocolString(protocol: Protocol?): String {
         if (protocol == null) return DEFAULT_REPORT_VALUE
         val preparedDate = protocol.date.atZoneSameInstant(protocol.timeZone.toZoneId())
-        val dateString = "«${preparedDate.dayOfMonth}» " +
+        val dateString = "${preparedDate.dayOfMonth} " +
             "${preparedDate.month.getDisplayName(TextStyle.FULL, Locale.of("ru"))} " +
             "${preparedDate.year}"
         return "№ ${protocol.number} от $dateString"
