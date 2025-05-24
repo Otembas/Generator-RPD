@@ -107,7 +107,7 @@ class ReportsService(
                     } else {
                         null
                     }
-                }
+                }.joinToString(", ")
                 reportInfo = info[filter.id]!!
             }
             val metadata = FieldsMetadata()
@@ -144,6 +144,7 @@ class ReportsService(
         File(generatedDir.path.substringBeforeLast("\\")).listFiles()?.forEach { file ->
             if (file.name.contains(id.toString())) file.delete()
         }
+        info.remove(id)
     }
 
     /**

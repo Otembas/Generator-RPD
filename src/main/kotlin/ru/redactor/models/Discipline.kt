@@ -26,7 +26,7 @@ data class Discipline(
     val semestersHours: SemestersHours,
     val department: Department
 ) {
-    lateinit var previousDisciplines: List<String>
+    lateinit var previousDisciplines: String
 
     lateinit var reportInfo: ReportInfo
 

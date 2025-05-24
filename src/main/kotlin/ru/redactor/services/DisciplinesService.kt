@@ -215,7 +215,11 @@ class DisciplinesService(
         row.getCell(columnIndex + 2).let {
             if (!it.cellStyle.font.bold) {
                 val department = getDepartment(row)
-                if (departmentFilterValue != null && department.name != departmentFilterValue) return@let null
+                if (departmentFilterValue != null &&
+                    department.name.replaceFirstChar { firstChar -> firstChar.uppercase() } != departmentFilterValue
+                ) {
+                    return@let null
+                }
                 val competences = getCompetences(workbook, row, competenciesCell)
                 val unitsCell = excelService.findCellByValue(sheet, "з.е.")!!
                 val hoursCell = excelService.findCellByValue(sheet, "Итого акад.часов")!!
