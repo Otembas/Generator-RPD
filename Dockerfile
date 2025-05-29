@@ -1,11 +1,10 @@
-FROM ubuntu:latest AS build
-RUN apt-get update
-RUN apt-get install openjdk-21-jdk -y
-COPY . .
-RUN ./gradlew bootJar --no-daemon
+FROM gradle:8.14.0 AS build
+COPY --chown=gradle:gradle . /home/gradle/src
+WORKDIR /home/gradle/src
+RUN gradle build
 
-FROM eclipse-temurin:21-jre
-EXPOSE 8083
-COPY --from=build /build/libs/generator-rpd-0.0.1.jar app.jar
-
-ENTRYPOINT ["java", "-jar", "app.jar"]
+FROM openjdk:8-jre-slim
+EXPOSE 8080
+COPY --from=build /home/gradle/src/build/libs/generator-rpd-0.0.1.jar /app/
+RUN bash -c 'touch /app/generator-rpd-0.0.1.jar'
+ENTRYPOINT ["java", "-jar", "/app/generator-rpd-0.0.1.jar"]
