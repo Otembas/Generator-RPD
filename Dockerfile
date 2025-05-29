@@ -5,6 +5,7 @@ ENV GRADLE_USER_HOME /home/gradle/cache
 RUN mkdir -p ${BUILD_SRC}
 RUN mkdir -p ${GRADLE_USER_HOME}
 COPY gradle ${BUILD_SRC}gradle
+COPY config ${BUILD_SRC}config
 COPY gradlew build.gradle.kts settings.gradle.kts gradle.properties ${BUILD_SRC}
 WORKDIR ${BUILD_SRC}
 RUN gradle build -i --build-cache || return 0 && echo "Error is ok at 1st stage"
