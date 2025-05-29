@@ -19,8 +19,7 @@ ENV EXTRACTED /opt/generator
 RUN mkdir -p ${EXTRACTED} && (cd ${EXTRACTED}; java -Djarmode=layertools -jar ${BUILD_SRC}build/libs/generator-*.jar extract)
 RUN du -hs ${EXTRACTED}/*
 
-ARG JAVA_IMAGE=eclipse-temurin:21-jre
-FROM ${JAVA_IMAGE}
+FROM eclipse-temurin:21-jre
 ENV EXTRACTED /opt/generator
 USER root
 WORKDIR /opt/generator
