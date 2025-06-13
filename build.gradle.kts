@@ -87,6 +87,10 @@ tasks.withType<Jar> {
     }
 }
 
+tasks.named("jar") {
+    enabled = false
+}
+
 configurations["detekt"].resolutionStrategy.eachDependency {
     if (requested.group == "org.jetbrains.kotlin") {
         useVersion(getSupportedKotlinVersion())
