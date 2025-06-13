@@ -1,0 +1,8 @@
+.kotlin
+.idea
+.gradle
+.gitignore
+.dockerignore
+Dockerfile
+
+/config/application-*.yml

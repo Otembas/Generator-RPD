@@ -1,6 +1,6 @@
 ARG GRADLE_IMAGE=gradle:8.14.0-jdk21
 FROM ${GRADLE_IMAGE} as gradle-cache
-ENV BUILD_SRC /usr/src/generator
+ENV BUILD_SRC /usr/src/generator/
 ENV GRADLE_USER_HOME /home/gradle/cache
 RUN mkdir -p ${BUILD_SRC}
 RUN mkdir -p ${GRADLE_USER_HOME}
@@ -10,7 +10,7 @@ WORKDIR ${BUILD_SRC}
 RUN gradle build -i --build-cache || return 0 && echo "Error is ok at 1st stage"
 
 FROM gradle-cache as builder
-ENV BUILD_SRC /usr/src/generator
+ENV BUILD_SRC /usr/src/generator/
 COPY . ${BUILD_SRC}
 WORKDIR ${BUILD_SRC}
 RUN gradle bootJar -i --stacktrace --build-cache
