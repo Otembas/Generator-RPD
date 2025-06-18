@@ -14,7 +14,6 @@ import ru.redactor.models.DisciplineHours
 import ru.redactor.models.Semester
 import ru.redactor.models.SemestersHours
 import ru.redactor.models.TypeWork
-import ru.redactor.properties.AppProperties
 import ru.redactor.repositories.DepartmentsRepository
 import ru.redactor.repositories.DisciplinesRepository
 import java.util.UUID
@@ -22,7 +21,6 @@ import java.util.UUID
 /**
  * Сервис для работы с дисциплинами.
  *
- * @property appProperties Настройки приложения
  * @property excelService Сервис для работы с excel файлами
  * @property departmentsRepository Репозиторий для работы с кафедрами
  * @property disciplinesRepository Репозиторий для работы с дисциплинами
@@ -31,7 +29,6 @@ import java.util.UUID
  */
 @Service
 class DisciplinesService(
-    private val appProperties: AppProperties,
     private val excelService: ExcelService,
     private val departmentsRepository: DepartmentsRepository,
     private val disciplinesRepository: DisciplinesRepository
@@ -42,6 +39,11 @@ class DisciplinesService(
          */
         private const val DEFAULT_UNIT_IN_HOURS = 36
     }
+
+    /**
+     * Имена типов работ в файле
+     */
+    private val typeWorksNames = TypeWorks.entries.map { it.workName }
 
     /**
      * Возвращает список дисциплин из excel файла.
@@ -291,7 +293,7 @@ class DisciplinesService(
                     )
             }
             i++
-            currentCell = currentCell.row.getCell(currentCell.columnIndex + appProperties.semesterOffset)
+            currentCell = excelService.nextSemesterCell(currentCell)
         }
         val unitInHours = excelService.findCellByValue(
             firstCourseCell.sheet.workbook.getSheet("Нормы"),
@@ -319,11 +321,15 @@ class DisciplinesService(
         typeWorkNamesRow: Row
     ): Map<String, String> {
         val typeWorksWithHours = mutableMapOf<String, String>()
-        for (i in 0..<appProperties.semesterOffset) {
-            val name = typeWorkNamesRow.getCell(semesterColumn + i).stringCellValue
-            val value = disciplineRow.getCell(semesterColumn + i).stringCellValue
+        var i = 0
+        var name: String
+        var value: String
+        do {
+            i++
+            name = typeWorkNamesRow.getCell(semesterColumn + i).stringCellValue.replace(" ", "")
+            value = disciplineRow.getCell(semesterColumn + i).stringCellValue
             typeWorksWithHours[name] = value
-        }
+        } while (name in typeWorksNames)
         return typeWorksWithHours
     }
 
