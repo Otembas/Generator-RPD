@@ -7,6 +7,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.stereotype.Service
+import ru.redactor.properties.AppProperties
 
 /**
  * Сервис для работы с excel файлами.
@@ -14,7 +15,14 @@ import org.springframework.stereotype.Service
  * @author Konstantin Rogachev <ghosix7@gmail.com>
  */
 @Service
-class ExcelService {
+class ExcelService(private val appProperties: AppProperties) {
+    companion object {
+        /**
+         * Имя столбца с закрепленными кафедрами
+         */
+        private const val FIXED_DEPARTMENT_COLUMN_NAME = "Закрепленная кафедра"
+    }
+
     /**
      * Возвращает ячейку по ее значению.
      *
@@ -98,4 +106,21 @@ class ExcelService {
                 false
             }
         }
+
+    /**
+     * Возвращает ячейку следующего семестра.
+     *
+     * @param previousCell Ячейка с предыдущим семестром
+     *
+     * @return Ячейка
+     */
+    fun nextSemesterCell(previousCell: Cell): Cell {
+        var valueCell = previousCell.row.getCell(previousCell.columnIndex + appProperties.semesterOffset)
+        var value = valueCell.stringCellValue
+        while (value.isBlank() || (value != FIXED_DEPARTMENT_COLUMN_NAME && !value.contains("Семестр"))) {
+            valueCell = valueCell.row.getCell(valueCell.columnIndex + 1) ?: break
+            value = valueCell.stringCellValue
+        }
+        return valueCell
+    }
 }
